@@ -1,0 +1,27 @@
+<script type="text/javascript" charset="utf-8">
+  function redirect() {
+    if (window.location.search) {
+      var p = window.location.search.substring(1).split('=');
+      if (p[0] === 'redirect_uri' && p[1] != null) {
+        window.location = decodeURIComponent(p[1]);
+        return;
+      }
+    }
+
+    return window.location = "/";
+  }
+
+  var token = getReferralToken();
+
+  if (token) {
+    claimReferralToken(token).then(function () {
+      console.log('Successfully claimed referral token');
+    }).catch(function (reason) {
+      console.error('Failed claiming referral token', reason);
+    }).finally(function () {
+      redirect();
+    });
+  } else {
+    redirect();
+  }
+</script>

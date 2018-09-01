@@ -1,0 +1,20 @@
+<h1>Home</h1>
+<% if @current_user.present? %>
+  <p><%= @current_user.name %></p>
+  <a href="<%= logout_url %>">Logout</a>
+<% else %>
+  <p>Not authenticated</p>
+  <a href="/auth/facebook">Sign in</a>
+<% end %>
+
+<div style="margin-top: 32px">
+  <a href="#" id="wipe-local-storage">Wipe localStorage</a>
+</div>
+
+<script type="text/javascript" charset="utf-8">
+  document.getElementById('wipe-local-storage').addEventListener('click', function (e) {
+    e.preventDefault();
+
+    localStorage.clear();
+  })
+</script>

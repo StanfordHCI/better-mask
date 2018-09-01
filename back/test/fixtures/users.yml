@@ -1,0 +1,36 @@
+# == Schema Information
+#
+# Table name: users
+#
+#  id            :bigint(8)        not null, primary key
+#  admin         :boolean          default(FALSE), not null
+#  name          :string(255)
+#  referral_code :string(255)      not null
+#  token         :string(255)
+#  uid           :string(255)
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
+#
+# Indexes
+#
+#  index_users_on_referral_code  (referral_code) UNIQUE
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+alice:
+  uid: 1234517234
+  name: Alice
+  token: 3ea5e9cc8994f763a8cd0c3c4f8a5d38a674768cfdddfb3101ab920d94da3d1b66d3fb3afdca8d9fb2db84c970c7beac
+  referral_code: alice
+
+bob:
+  uid: 7391247123
+  name: Bob
+  token: ba971ffa046d9e47d6f4b0ffad5558c5fc7fcf84bef68096f103fcd1dbdf11ac2ae407d5cfdd4f32f1bb986d35a8794d
+  referral_code: bob
+
+charlie:
+  uid: 7391247123
+  name: Charlie
+  referral_code: charlie

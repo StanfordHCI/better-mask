@@ -1,0 +1,166 @@
+<style>
+  #root {
+    max-width: 1024px;
+    margin: 0 auto;
+    text-align: center;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  #root h1 {
+    text-align: center;
+  }
+
+  .flex-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .flex-col {
+    width: 200px;
+    padding: 0 32px;
+  }
+
+  input#referral-link {
+    font-size: 1.6em;
+    padding: 8px;
+    border: 1px solid lightgray;
+  }
+
+  button#copy-button {
+    font-size: 1.6em;
+    padding: 8px;
+    border: 1px solid #8363d4;
+    background: #8363d4;
+    color: white;
+  }
+
+  a.flat-link {
+    text-decoration: inherit;
+    color: inherit;
+  }
+
+  a.flat-link:hover {
+    text-decoration: inherit;
+    color: inherit;
+  }
+</style>
+
+<div id="hidden-root" style="display: none">
+  <div id="root">
+    <h1>Install Bettermask to continue</h1>
+
+    <p>
+      Bettermask is a <strong>simple</strong> and <strong>secure
+      crypto-assets wallet</strong>.
+    </p>
+
+
+    <div>
+      <%= image_tag 'download_bettermask/chrome-logo.svg', style: 'width: 180px' %>
+    </div>
+    <h2 style="margin-bottom: 0">Chrome extension</h2>
+    <p>Open the following link in Chrome to install the extension:</p>
+    <div>
+      <input id="referral-link" type="text" readonly value="<%= session[:referral_link] %>" /><button id="copy-button">Copy Link</button>
+    </div>
+    <div style="margin-bottom: 64px">
+      <span>&nbsp;</span>
+      <span id="copy-confirm" style="display: none">Copied!</span>
+      <span>&nbsp;</span>
+    </div>
+
+    <h2>Other options</h2>
+
+    <div class="flex-row">
+      <div class="flex-col">
+        <a class="flat-link" href="/coming-soon/android">
+          <div class="icon">
+            <%= image_tag 'download_bettermask/google_play_store.png', style: 'width: 100%' %>
+          </div>
+          <div>
+            <h3>Android app</h3>
+          </div>
+        </a>
+      </div>
+
+      <div class="flex-col">
+        <a class="flat-link" href="/coming-soon/ios">
+          <div class="icon">
+            <%= image_tag 'download_bettermask/ios_app_store.png', style: 'width: 100%' %>
+          </div>
+          <div>
+            <h3>iOS app</h3>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript" charset="utf-8">
+  function attachCopyHandler() {
+    var btn = document.getElementById('copy-button');
+    var link = document.getElementById('referral-link');
+    var confirm = document.getElementById('copy-confirm');
+    btn.addEventListener('click', function () {
+      link.select();
+      /* Copy the text inside the text field */
+      document.execCommand("copy");
+
+      confirm.style.display = 'inline';
+      setTimeout(function() {
+        confirm.style.display = 'none';
+      }, 1000)
+    })
+  }
+
+  function isChrome() {
+    try {
+      window.chrome.runtime.sendMessage;
+      return true;
+    } catch(er) {
+      return false;
+    }
+  }
+
+  function isAndroid() {
+    // https://stackoverflow.com/questions/6031412/detect-android-phone-via-javascript-jquery
+    var ua = navigator.userAgent.toLowerCase();
+    return ua.indexOf("android") > -1; // && ua.indexOf("mobile"); // ???
+  }
+
+  function isIPhone() {
+    var ua = navigator.userAgent.toLowerCase();
+    return ua.indexOf("iphone") > -1; // && ua.indexOf("mobile"); // ???
+  }
+
+  function redirect() {
+    var chromeUrl = 'https://chrome.google.com/webstore/detail/example';
+
+    if (isChrome()) {
+      window.location.href = chromeUrl;
+      return;
+    }
+
+    if (isAndroid()) {
+      window.location.href = '/coming-soon/android';
+      return;
+    }
+
+    if (isIPhone()) {
+      window.location.href = '/coming-soon/ios';
+      return;
+    }
+
+    document.getElementById('hidden-root').style.display = 'block';
+  }
+
+  window.history.replaceState({}, 'Install Bettermask', '<%= session[:referral_link] %>');
+
+  attachCopyHandler();
+  redirect();
+</script>

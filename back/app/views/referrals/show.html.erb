@@ -1,0 +1,20 @@
+<script type="text/javascript" charset="utf-8">
+  var pending_referral_data = {
+    referral_code: "<%= referrer.referral_code %>",
+    application_slug: "<%= app.slug %>",
+    http_referrer: document.referrer,
+  };
+
+  var existingToken = getReferralToken();
+  if(existingToken) pending_referral_data.referral_token = existingToken;
+
+  createPendingReferral(pending_referral_data)
+    .then(function (response) {
+      saveReferralToken(response.data.token);
+      window.location = "<%= redirect_url %>";
+    })
+    .catch(function (error) {
+      console.warn('Failed creating pending referral: ', error);
+      window.location = "<%= redirect_url %>";
+    });
+</script>

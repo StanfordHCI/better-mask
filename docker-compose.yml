@@ -1,0 +1,45 @@
+version: '3.7'
+
+services:
+  db:
+    image: mysql:8.0.11
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_DATABASE: bettermask
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    volumes:
+      - ${DATA_DIRECTORY}/db/mysql:/var/lib/mysql
+      - ${DATA_DIRECTORY}/db/log:/var/log/mysql
+
+  app:
+    build:
+      context: .
+      args:
+        - RAILS_ENV=production
+    environment:
+      RAILS_ENV: production
+      DB_HOST: db
+      DB_NAME: bettermask
+      DB_USER: root
+      DB_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE}
+      FACEBOOK_APP_ID: ${FACEBOOK_APP_ID}
+      FACEBOOK_APP_SECRET: ${FACEBOOK_APP_SECRET}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS}
+    ports:
+      - 8080:80
+      - 4430:443
+    links:
+      - db
+    depends_on:
+      - db
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z 127.0.0.1 80 || exit 1"]
+      interval: 5m
+      start_period: 1m
+    volumes:
+      - ${DATA_DIRECTORY}/app/rails_logs:/home/app/webapp/log
+      - ${DATA_DIRECTORY}/app/nginx_logs:/var/log/nginx
+      - ${DATA_DIRECTORY}/app/letsencrypt:/etc/letsencrypt

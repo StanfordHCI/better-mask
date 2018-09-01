@@ -1,0 +1,37 @@
+# == Schema Information
+#
+# Table name: referrals
+#
+#  id                :bigint(8)        not null, primary key
+#  converted         :boolean          default(FALSE), not null
+#  http_referrer     :string(255)
+#  ip_address        :string(255)
+#  created_at        :datetime         not null
+#  updated_at        :datetime         not null
+#  app_id            :bigint(8)
+#  referral_token_id :bigint(8)
+#  referring_user_id :bigint(8)
+#
+# Indexes
+#
+#  index_referrals_on_app_id             (app_id)
+#  index_referrals_on_referral_token_id  (referral_token_id)
+#  index_referrals_on_referring_user_id  (referring_user_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (app_id => apps.id)
+#  fk_rails_...  (referral_token_id => referral_tokens.id)
+#  fk_rails_...  (referring_user_id => users.id)
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  referral_token: one
+  referring_user: alice
+
+two:
+  app: toris
+  referring_user: bob
+  referral_token: claimed # by Alice

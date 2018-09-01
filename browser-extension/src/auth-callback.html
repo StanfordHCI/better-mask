@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Blockchain explorer</title>
+</head>
+<body>
+  <style>
+    body {
+      background: #efefef;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      text-align: center;
+    }
+  </style>
+
+  <p>Hang tight! Signing you in...</p>
+
+  <p style="display: none" id="debug-redirect-link">
+    <a href="#" id="debug-redirect-link__a">Redirect me!</a> <br />
+    You're seeing this instead of being directly redirected
+    because process.env.METAMASK_DEBUG is set to true.
+  </p>
+</body>
+</html>

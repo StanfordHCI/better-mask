@@ -1,0 +1,15 @@
+version: '3.7'
+
+services:
+  sealer:
+    build:
+      context: .
+      args:
+        SEALER_PASSWORD: ${SEALER_PASSWORD}
+    volumes:
+      - ${DATA_DIRECTORY}/becoin_sealer:/datadir
+    environment:
+      SEALER_PASSWORD: ${SEALER_PASSWORD}
+      SEALER_ADDRESS: ${SEALER_ADDRESS}
+    ports:
+      - 8545:8545

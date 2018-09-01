@@ -1,0 +1,2 @@
+module CoinRewardsHelper
+end

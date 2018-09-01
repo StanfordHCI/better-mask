@@ -1,0 +1,24 @@
+<p>
+  Please be patient! You should be redirected soon!
+</p>
+
+<script type="text/javascript" charset="utf-8">
+  function postTokenToExtension() {
+    // var p = window.location.hash.substring(1).split('&').find(function(s) { return s.split('=')[0] === "access_token" });
+
+    var params = {};
+    var queryString = window.location.hash.substring(1);
+    var regex = /([^&=]+)=([^&]*)/g;
+    var m = regex.exec(queryString);
+
+    while (m) {
+      params[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
+      m = regex.exec(queryString);
+    }
+
+    var data = { type: "blockchain-explorer__oauth-callback", params: params };
+    window.postMessage(data, '<%= root_url %>');
+  }
+
+  postTokenToExtension();
+</script>
