@@ -11,6 +11,7 @@ import {selectTransaction} from 'data/transactions';
 
 import txHelper from './lib/tx-helper';
 import {getEnvironmentType} from 'data/metamask/utils';
+import {isGoingThroughAuthFlow} from 'lib/authFlow';
 
 const { fetchLocale } = require('./lib/i18n-helper')
 const { ENVIRONMENT_TYPE_POPUP } = require('metamask-crx/app/scripts/lib/enums')
@@ -72,8 +73,11 @@ async function startApp(metamaskState, accountManager, opts) {
   })
 
   const { metamask: { isUnlocked, isInitialized } } = store.getState();
+  
   if (isUnlocked && isInitialized) {
     handlePendingTransactions(store);
+  } else {
+    await handlePendingAuthFlow();
   }
 
   accountManager.on('update', function (metamaskState) {
@@ -114,5 +118,12 @@ const handlePendingTransactions = (store) => {
     store.dispatch(selectTransaction(selected.id));
 
     window.location = window.location.pathname + '#pending-transactions';
+  }
+}
+
+const handlePendingAuthFlow = async () => {
+  const authFlow = await isGoingThroughAuthFlow();
+  if (authFlow) {
+    window.location = window.location.pathname + '#auth-callback';
   }
 }

@@ -1,4 +1,5 @@
 import React from 'react';
+import {connect} from 'react-redux';
 import styled from 'styled-components';
 import FlexCenter from 'components/FlexCenter';
 
@@ -6,10 +7,10 @@ import Icon from '@material-ui/core/Icon';
 import Button from '@material-ui/core/Button';
 import TradeIcon from '@material-ui/icons/CompareArrows';
 
-import tori from './img/tori.png';
 import FlatLink from 'components/FlatLink';
 import {REFERRALS_ROUTE} from 'routes';
-// import NewsCarousel from './components/NewsCarousel';
+import {fetchProfile} from 'data/user';
+import {CircularProgress} from '@material-ui/core';
 
 const Wrapper = styled.div`
   padding: 24px;
@@ -45,6 +46,7 @@ const AssetCol = styled.div`
 const AssetBalance = styled(AssetCol)`
   font-size: 2em;
   flex-grow: 1;
+  margin-bottom: 8px;
 
   @media screen and (max-width: ${p => p.theme.breakpoints[0]}) {
     font-size: 1.5em;
@@ -73,20 +75,33 @@ const LogoWrapper = styled(FlexCenter)`
   }
 `;
 
-export default class Assets extends React.Component {
+class Assets extends React.Component {
+  componentDidMount() {
+    if (this.props.balances || this.props.fetchingProfile) return;
+    this.props.fetchProfile();
+  }
+
   render() {
+    const loading = this.props.fetchingProfile || !this.props.balances;
+    const bctBalance = loading ? 0 : this.props.balances.bct;
+
     return (
       <div>
         <Wrapper>
-          <AssetRow style={{marginBottom: 16}} >
+          <AssetRow style={{marginBottom: 0}}>
             <AssetCol>
               <LogoWrapper>
-                <span style={{fontSize: '1.5em', fontWeight: 'bold'}} >DTI</span>
+                <span style={{fontSize: '1.5em', fontWeight: 'bold'}}>BCT</span>
               </LogoWrapper>
             </AssetCol>
 
             <AssetBalance>
-              1 DTI
+              {
+                loading ?
+                  <CircularProgress />
+                  :
+                  bctBalance + " BCT"
+              }
             </AssetBalance>
 
             <AssetCol style={{marginRight: 0}}>
@@ -100,8 +115,8 @@ export default class Assets extends React.Component {
           </AssetRow>
           <AssetRow style={{justifyContent: 'flex-end'}}>
             <p style={{marginTop: 0, fontSize: '1.1em', textAlign: 'right'}}>
-              Earn 1 DTI Coin for each friend who joins the DTI network.
-              They also get a free DTI Coin.
+              Earn 1 BCT Coin for each friend who joins the BCT network.
+              They also get a free BCT Coin.
             </p>
           </AssetRow>
         </Wrapper>
@@ -109,3 +124,10 @@ export default class Assets extends React.Component {
     )
   }
 }
+
+export default connect((state) => ({
+  fetchingProfile: state.user.fetchingProfile,
+  balances: state.user.balances,
+}), (dispatch) => ({
+  fetchProfile: () => dispatch(fetchProfile())
+}))(Assets);

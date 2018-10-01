@@ -26,3 +26,8 @@ one:
   seed_words: "wow so fixture very test much code so coverage"
   user: charlie
 
+two:
+  password: swag
+  seed_words: "wow such vault much fixture very secure much awesome incredible value proposition"
+  user: daniel
+

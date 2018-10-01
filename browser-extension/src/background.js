@@ -33,8 +33,16 @@ const {
   ENVIRONMENT_TYPE_FULLSCREEN,
 } = require('metamask-crx/app/scripts/lib/enums')
 
-import { API_TOKEN_STORAGE_KEY, BETTERMASK_RPC_ENDPOINT, OAUTH_CALLBACK_MESSAGE_TYPE, OAUTH_CROSS_CLIENT_STORAGE_KEY } from './constants';
+import {
+  API_TOKEN_STORAGE_KEY,
+  BETTERMASK_RPC_ENDPOINT,
+  OAUTH_CALLBACK_MESSAGE_TYPE,
+  OAUTH_CROSS_CLIENT_STORAGE_KEY,
+  START_OAUTH_FLOW_MESSAGE_TYPE
+} from './constants';
 import AsyncStorage from './bettermask/lib/AsyncStorage';
+import {setOngoingAuthFlow} from 'lib/authFlow';
+import {getAuthorizationUrl} from 'data/auth/utils';
 
 const STORAGE_KEY = 'metamask-config'
 const METAMASK_DEBUG = process.env.METAMASK_DEBUG
@@ -45,7 +53,7 @@ const platform = new ExtensionPlatform()
 const notificationManager = new NotificationManager()
 global.METAMASK_NOTIFIER = notificationManager
 
-// XXX disabled for blockchain explorer
+// XXX disabled for Bettermask
 // setup sentry error reporting
 // const release = platform.getVersion()
 // const raven = setupRaven({ release })
@@ -184,7 +192,7 @@ async function initialize () {
     }
   })
   
-  log.debug('Stored access token', token)
+  log.debug('Found stored access token', token)
 
   
   log.debug('MetaMask initialization complete.')
@@ -466,23 +474,42 @@ function triggerUi () {
 extension.runtime.onInstalled.addListener(function (details) {
   // if (METAMASK_DEBUG) return;
   if ((details.reason === 'install')) {
-    // communicate whether the extension was installed through
-    // the toris onboarding or something else
-    // possible implementation: the app sends a request to our backend to say "here's a potential user",
+    // How to communicate whether the extension was installed through
+    // an app's onboarding or something else (such as an airdrop)
+    // Possible implementation: the app sends a request to our backend to say "here's a potential user",
     // our backend replies with a set-cookie and we inspect the value of this cookie in the post-install page
     // to redirect to the correct postinstall hook.
     // (this would also allow us to track which app brings the more users)
 
     if (process.env.METAMASK_DEBUG) {
-      extension.tabs.create({url: 'http://localhost:3003/r'});
+      extension.tabs.create({url: 'http://localhost:8080/welcome-extension'});
       return;
     }
     
-    extension.tabs.create({url: 'https://tori.land/r/sign-in'});
+    extension.tabs.create({url: 'https://example.com/welcome-extension'});
   }
 });
 
-extension.runtime.onMessage.addListener(async (message) => {
+extension.runtime.onMessage.addListener(async (message, sender) => {
+  if (message.type === START_OAUTH_FLOW_MESSAGE_TYPE ) {
+    extension.tabs.query({
+      active: true,
+      lastFocusedWindow: true
+    }, (tabs) => {
+      const currentTab = tabs[0];
+      console.log("Current tab", currentTab);
+      
+      const welcomePage = process.env.METAMASK_DEBUG ? 'http://localhost:8080/welcome-extension' : 'https://example.com/welcome-extension';
+      const authorizationUrl = getAuthorizationUrl();
+
+      if (popupIsOpen && currentTab.url === welcomePage) {
+        extension.tabs.update(currentTab.id, {url: authorizationUrl});
+      } else {
+        extension.tabs.create({url: authorizationUrl});
+      }
+    });
+  }
+
   if (message.type === OAUTH_CALLBACK_MESSAGE_TYPE) {
     const { access_token, state } = message.params;
 
@@ -491,28 +518,25 @@ extension.runtime.onMessage.addListener(async (message) => {
       return;
     };
 
-    if (state && state === 'toris_onboarding_cross_client_oauth') {
-      await AsyncStorage.set(OAUTH_CROSS_CLIENT_STORAGE_KEY, true);
-    }
+    // if (state && state === 'app_onboarding_cross_client_oauth') {
+    //   await AsyncStorage.set(OAUTH_CROSS_CLIENT_STORAGE_KEY, true);
+    // }
 
+    log.debug('background.js: saving access token', access_token)
     await AsyncStorage.set(API_TOKEN_STORAGE_KEY, access_token);
+    
+    // Extension auth flow: set a flag to remember there is an auth flow going on. when the UI starts,
+    // check the value of this flag, and, if set to true, we open the auth callback route in order to
+    // perform the last steps of the authentication flow.
+    await setOngoingAuthFlow();
 
-    const homeUrl = extension.extension.getURL('home.html');
-    const redirectUrl = homeUrl + '#auth-callback'
-    return extension.tabs.update({url: redirectUrl});
+    const tabId = sender.tab.id;
+
+    const welcomePage2 = process.env.METAMASK_DEBUG ? 'http://localhost:8080/welcome-extension?signedin=1' : 'https://example.com/welcome-extension?signedin=1';
+
+    extension.tabs.update(tabId, {
+      url: welcomePage2,
+      active: true,
+    });
   }
 });
-
-// extension.webRequest.onBeforeRequest.addListener(
-//   function(details) {
-//     console.log(details);
-//     if (true) {
-//       return {redirectUrl: 'home.html'};
-//     }
-//   }, {
-//     urls: ["chrome-extension://" + chrome.runtime.id + "/*"]
-//   }, [
-//     "blocking"
-//   ]
-// );
-

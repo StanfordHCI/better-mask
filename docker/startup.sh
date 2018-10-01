@@ -17,7 +17,7 @@ migrate_db() {
   # TODO Load the schema and seed the db if the database schema hasn't been loaded yet
   # (ie run bundle exec rake db:schema:load db:seed)
   # An idea to check if the schema is loaded & decide what to do accordingly:
-  # mysql -u root --database blockchain-explorer-back_development -e "SELECT * FROM schema_migrations"
+  # mysql -u root --database bettermask-back_development -e "SELECT * FROM schema_migrations"
   # If we don't have a mysql CLI, we could also probably do that with a rake task?
   bundle exec rake db:migrate
   echo "Database migrated!"

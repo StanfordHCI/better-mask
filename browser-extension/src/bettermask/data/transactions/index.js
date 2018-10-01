@@ -76,8 +76,6 @@ export const signTransaction = (id) => {
         default: throw new Error('data/transactions#signTransaction: Unrecognized transaction type.');
       }
       
-      debugger;
-      
       // TODO switch on tx.type and/or presence of tx.msgParams etc... to know which signUtil to call.
 
     } catch(er) {

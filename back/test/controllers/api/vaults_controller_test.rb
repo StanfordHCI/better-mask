@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class VaultsControllerTest < ActionDispatch::IntegrationTest
+class Api::VaultsControllerTest < ActionDispatch::IntegrationTest
   test "index returns no_content if the user has no vault" do
     oauth_user users(:alice)
     get '/api/vaults'

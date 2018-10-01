@@ -1,5 +1,7 @@
 FROM phusion/passenger-ruby25
 
+ARG USE_HTTP
+
 # Add the Certbot repository
 RUN add-apt-repository ppa:certbot/certbot
 
@@ -12,8 +14,12 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -yq install netcat 
 RUN rm -f /etc/service/nginx/down && \
     rm /etc/nginx/sites-enabled/default
 
+COPY ./docker/webapp.conf ./webapp.conf
+COPY ./docker/webapp_ssl.conf ./webapp_ssl.conf
+
 # Add the nginx config file
-COPY ./docker/webapp.conf /etc/nginx/sites-enabled/webapp.conf
+# COPY ./docker/webapp.conf /etc/nginx/sites-enabled/webapp.conf
+RUN if [ -n "$USE_HTTP" ] ; then cp ./webapp.conf /etc/nginx/sites-enabled ; else cp ./webapp_ssl.conf /etc/nginx/sites-enabled ; fi
 
 # Dockerfile:
 COPY ./docker/db-env.conf /etc/nginx/main.d/db-env.conf

@@ -29,7 +29,7 @@ class AuthCallback extends React.Component {
 
     const accessToken = params.access_token;
 
-    var data = { type: "blockchain-explorer__access-token-received", access_token: accessToken };
+    var data = { type: "bettermask__access-token-received", access_token: accessToken };
     window.postMessage(data, "*");
 
     localStorage.setItem(ACCESS_TOKEN_LOCALSTORAGE_KEY, accessToken);

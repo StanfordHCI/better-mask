@@ -1,7 +1,7 @@
 import axios from 'axios';
 import extension from 'extensionizer';
 
-import {API_TOKEN_STORAGE_KEY} from '../../constants';
+import {API_TOKEN_STORAGE_KEY, BACKEND_URL} from '../../constants';
 
 export async function getStoredToken() {
   return new Promise(resolve => {
@@ -15,8 +15,14 @@ export async function getStoredToken() {
   });
 }
 
-// never imported?
-export const BACKEND_URL = process.env.BACKEND_URL;
+export async function clearStoredToken() {
+  return new Promise((resolve, reject) => {
+    extension.storage.local.remove(API_TOKEN_STORAGE_KEY, () => {
+      if (extension.runtime.lastError) reject();
+      resolve(null);
+    });
+  });
+}
 
 const req = axios.create({
   baseURL: BACKEND_URL,
@@ -29,10 +35,11 @@ async function getOptions() {
   return { headers };
 }
 
-function handleError(er) {
+async function handleError(er) {
   if (er.response && er.response.status === 401) {
     console.error("Caught unauthorized error");
-    window.location = '/home.html';
+    await clearStoredToken();
+    window.location = '/home.html#unlock';
   } else {
     throw er;
   }
@@ -44,7 +51,7 @@ export async function get(url) {
     const res = await req.get(url, options);
     return res.data;
   } catch(er) {
-    handleError(er);
+    await handleError(er);
   }
 }
 
@@ -54,6 +61,6 @@ export async function post(url, body) {
     const res = await req.post(url, body, options);
     return res.data;
   } catch(er) {
-    handleError(er);
+    await handleError(er);
   }
 }

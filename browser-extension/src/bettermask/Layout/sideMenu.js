@@ -72,7 +72,7 @@ export const recentApps = (
       <ListItemIcon>
         <GameIcon />
       </ListItemIcon>
-      <ListItemText primary="Tori.Land" />
+      <ListItemText primary="App.one" />
     </ListItem>
 
     <ListItem button>

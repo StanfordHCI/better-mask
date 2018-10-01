@@ -15,7 +15,7 @@ class ReferralsControllerTest < ActionDispatch::IntegrationTest
     # so we nest some resources on the DTO returned by this endpoint.
     # This is NOT a general pattern for the whole API:
     assert_not_nil parsed['referring_user_name']
-    assert_not_nil parsed['application']
+    assert_not_nil parsed['app']
   end
 
   test 'invalid referral code yields an error' do
@@ -24,26 +24,5 @@ class ReferralsControllerTest < ActionDispatch::IntegrationTest
 
     post '/referrals', params: {referral_code: 'bob', application_slug: 'azerty'}
     assert_response :not_found
-  end
-
-  test 'can mark a referral as converted' do
-    user = users(:alice)
-    token = referral_tokens(:claimed)
-    referral = Referral.where(referral_token: token).first
-
-    app_slug = referral.app.slug
-
-    assert referral.converted === false
-
-    authenticated_post '/referrals/convert', params: {application_slug: app_slug}, user: user
-    assert_response :no_content
-
-    referral.reload
-    assert referral.converted === true
-  end
-
-  test 'invalid referral token yields an error' do
-    post '/referrals/convert', params: {token: 'pickle_rick'}
-    assert_response :unauthorized
   end
 end

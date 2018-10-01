@@ -4,6 +4,9 @@
 #
 #  id            :bigint(8)        not null, primary key
 #  admin         :boolean          default(FALSE), not null
+#  email         :string(255)
+#  first_name    :string(255)
+#  last_name     :string(255)
 #  name          :string(255)
 #  referral_code :string(255)      not null
 #  token         :string(255)
@@ -31,6 +34,12 @@ bob:
   referral_code: bob
 
 charlie:
-  uid: 7391247123
+  uid: 2134285648
   name: Charlie
   referral_code: charlie
+
+daniel:
+  uid: 2345823496
+  name: Daniel
+  referral_code: ukqWxG9
+

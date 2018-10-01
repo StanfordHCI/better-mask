@@ -60,9 +60,9 @@ const generateVault = () => {
     // Generate a password and a keychain:
     const password = randomPassword();
     await dispatch(actions.createNewVaultAndKeychain(password));
-    
+
     const background = getBackground();
-    
+
     // Get the seed words for this new keychain:
     const seedWords = await new Promise((resolve, reject) => {
       background.placeSeedWords((err, seedWords) => {

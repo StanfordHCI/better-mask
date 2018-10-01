@@ -1,4 +1,6 @@
 import React from 'react';
+import extension from 'extensionizer';
+
 import Button from '@material-ui/core/Button';
 
 import {connect} from 'react-redux';
@@ -6,6 +8,8 @@ import {Redirect} from 'react-router-dom';
 import PropTypes from 'prop-types';
 import {INITIALIZE_GENERATE_VAULT_ROUTE} from '../routes';
 import {getAuthorizationUrl} from 'data/auth/utils';
+import AsyncStorage from 'lib/AsyncStorage';
+import {START_OAUTH_FLOW_MESSAGE_TYPE} from '../../../../constants';
 
 const HEADER_STYLE = {
   fontSize: '1.65em',
@@ -13,6 +17,14 @@ const HEADER_STYLE = {
 }
 
 class SocialLogin extends React.Component {
+  startAuthFlow = () => {
+    extension.runtime.sendMessage({
+      type: START_OAUTH_FLOW_MESSAGE_TYPE,
+    });
+    
+    window.close();
+  }
+
   render() {
     const {authenticated} = this.props;
     
@@ -31,10 +43,14 @@ class SocialLogin extends React.Component {
         </p>
 
 
-        <div style={{marginBottom: 48}} >
-          <a href={getAuthorizationUrl()} target={this.props.isPopup ? "_blank" : "_self"} rel="noopener noreferrer">
-            <Button variant="raised" color="primary" size="large">Sign in with Faceboook</Button>
-          </a>
+        <div style={{marginBottom: 48}} >          
+          <Button
+            variant="raised"
+            color="primary"
+            size="large"
+            onClick={this.startAuthFlow}>
+            Sign in with Faceboook
+          </Button>
         </div>
 
         <p>

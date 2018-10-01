@@ -1,6 +1,6 @@
 {
-  "name": "blockchain-explorer",
-  "version": "0.0.6",
+  "name": "bettermask",
+  "version": "0.0.13",
   "description": "Blockchain made easy",
   "scripts": {
     "start": "node scripts/devserver.js",
@@ -30,6 +30,7 @@
     "react-toggle-button": "^2.2.0",
     "react-tooltip-component": "^0.3.0",
     "recompose": "^0.27.1",
+    "redux-logger": "^3.0.6",
     "styled-components": "^3.4.2"
   },
   "devDependencies": {

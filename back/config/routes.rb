@@ -3,6 +3,11 @@ Rails.application.routes.draw do
 
   root 'home#index'
 
+  get 'welcome-extension', to: 'home#extension_install_hook'
+  get 'download-bettermask', to: 'home#download_bettermask'
+  get 'coming-soon/:platform', to: 'home#coming_soon'
+  get 'detect-web3', to: 'home#detect_web3'
+
   get 'auth/facebook/callback', to: 'sessions#create'
   get 'auth/failure', to: redirect('/')
   get 'me', to: 'sessions#me'
@@ -15,6 +20,7 @@ Rails.application.routes.draw do
   #
 
   get 'r/:referral_code/:app_slug', to: 'referrals#show', as: :referral_link
+  get 'r/:referral_code/:app_slug/:source', to: 'referrals#show', as: :referral_link_with_source
 
   resources :referrals, only: [:create] do
     collection do
@@ -27,6 +33,8 @@ Rails.application.routes.draw do
       post 'claim'
     end
   end
+
+  get 'admin', to: 'admin#index'
 
   namespace :api do
     resources :apps, only: [:index]
@@ -49,6 +57,7 @@ Rails.application.routes.draw do
     end
 
     get '/me', to: 'users#me'
-    get '/referral-link', to: 'users#referral_link'
+    get '/referral-links', to: 'users#referral_links'
+    get '/offers', to: 'users#offers'
   end
 end

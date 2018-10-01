@@ -1,0 +1,61 @@
+<style>
+  body {
+    padding: 32px;
+  }
+  table {
+    table-layout: auto;
+    border-collapse: collapse;
+    width: 100%;
+  }
+  th, td {
+    padding: 2px;
+    border: 1px solid black;
+  }
+</style>
+
+<h2>Referrals</h2>
+
+<table>
+  <tr>
+    <th>Referral id</th>
+    <th>User id</th>
+    <th>First Name</th>
+    <th>Last name</th>
+    <th>User Agent</th>
+    <th>Source</th>
+  </tr>
+
+  <% referrals.each do |referral| %>
+    <tr>
+      <td><%= referral.id %></td>
+      <td><%= referral.referred_user.id if referral.referred_user.present? %></td>
+      <td><%= referral.referred_user.first_name if referral.referred_user.present? %></td>
+      <td><%= referral.referred_user.last_name if referral.referred_user.present? %></td>
+      <td><%= referral.user_agent %></td>
+      <td><%= referral.source %></td>
+    </tr>
+  <% end %>
+
+</table>
+
+
+<h2>Users</h2>
+
+<table>
+  <tr>
+    <th>Id</th>
+    <th>First Name</th>
+    <th>Last name</th>
+    <th>Creation date</th>
+  </tr>
+
+  <% users.each do |user| %>
+    <tr>
+      <td><%= user.id %></td>
+      <td><%= user.first_name %></td>
+      <td><%= user.last_name %></td>
+      <td><%= user.created_at %></td>
+    </tr>
+  <% end %>
+
+</table>

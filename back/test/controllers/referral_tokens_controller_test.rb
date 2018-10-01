@@ -4,8 +4,9 @@ class ReferralTokensControllerTest < ActionDispatch::IntegrationTest
   test 'should be able to claim a token' do
     ref_token = ReferralToken.first
     user = User.first
+    authenticate_user user
 
-    authenticated_post '/referral_tokens/claim', user: user, params: {token: ref_token.token}
+    post '/referral_tokens/claim', params: {token: ref_token.token}
 
     assert_response :success
     ref_token.reload
@@ -15,12 +16,14 @@ class ReferralTokensControllerTest < ActionDispatch::IntegrationTest
   test 'should not be able to claim a token if it is already claimed' do
     ref_token = ReferralToken.first
     user = User.first
+    authenticate_user user
 
-    authenticated_post '/referral_tokens/claim', user: user, params: {token: ref_token.token}
+    post '/referral_tokens/claim', params: {token: ref_token.token}
 
     user = User.second
+    authenticate_user user
 
-    authenticated_post '/referral_tokens/claim', user: user, params: {token: ref_token.token}
+    post '/referral_tokens/claim', params: {token: ref_token.token}
 
     assert_response :bad_request
 

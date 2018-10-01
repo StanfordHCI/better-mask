@@ -25,6 +25,7 @@ import './reboot.css.js';
 
 // Pages:
 import Routes from './components/router/Routes';
+import {loadAuthStatus} from 'data/auth';
 
 injectGlobal`
   @import url(https://fonts.googleapis.com/css?family=Roboto:300,400,500);
@@ -37,20 +38,25 @@ injectGlobal`
   }
 `;
 
-export default function App(props) {
-  const {store} = props;
+export default class App extends React.Component {
+  componentDidMount() {
+    this.props.store.dispatch(loadAuthStatus());
+  }
 
-  return (
-    <Provider store={store}>
-      <HashRouter hashType="noslash">
-        <ThemeProvider theme={styledComponentsTheme}>
-          <MuiThemeProvider theme={muiTheme}>
-            <Layout>
-              <Routes />
-            </Layout>
-          </MuiThemeProvider>
-        </ThemeProvider>
-      </HashRouter>
-    </Provider>
-  );
-};
+  render() {
+    const {store} = this.props;
+    return (
+      <Provider store={store}>
+        <HashRouter hashType="noslash">
+          <ThemeProvider theme={styledComponentsTheme}>
+            <MuiThemeProvider theme={muiTheme}>
+              <Layout>
+                <Routes />
+              </Layout>
+            </MuiThemeProvider>
+          </ThemeProvider>
+        </HashRouter>
+      </Provider>
+    );
+  }
+}

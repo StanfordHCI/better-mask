@@ -21,4 +21,14 @@
 
 class Vault < ApplicationRecord
   belongs_to :user
+
+  after_create :push_transactions
+
+  #
+  # Perform the blockchain related operations that we couldn't perform earlier
+  # because the user did not have a vault, therefore they did not have wallet address
+  #
+  def push_transactions
+    AirdropMint.push_transactions_for_pending_rewards(user)
+  end
 end

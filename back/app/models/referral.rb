@@ -6,6 +6,8 @@
 #  converted         :boolean          default(FALSE), not null
 #  http_referrer     :string(255)
 #  ip_address        :string(255)
+#  source            :string(255)
+#  user_agent        :string(255)
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #  app_id            :bigint(8)
@@ -44,54 +46,92 @@ class Referral < ApplicationRecord
     referral_token.token
   end
 
-  def self.create_or_touch_pending(params, ip: nil, referred_user: nil)
-    referring_user = User.find_by!(referral_code: params[:referral_code])
-    app = App.find_by!(slug: params[:application_slug])
+  #
+  # Create a pending referral (i.e not converted) or touch it to refresh its updated_at field:
+  #
+  # params hash: {:referral_code, :application_slug, :http_referrer, :referral_token, :source, :ip}
+  #
+  def self.create_or_touch_pending(referred_user, referral_code, app_slug, params)
+    referring_user = User.find_by!(referral_code: referral_code)
+    app = App.find_by!(slug: app_slug)
 
     referral = nil
 
+    # 1. Create the referral, either associating it with an existing referral token
+    #    or generating a new referral token if needed
     if params[:referral_token]
+      token_string = params[:referral_token]
+
+      # Remove the referral token from the params hash (it was a string - we do not want it to
+      # override the instance of the ReferralToken model we have just loaded when the
+      # params hash gets passed to #create or #update)
+      params.delete(:referral_token)
+
       # Try to link the pending referral with this referral token:
-      token = ReferralToken.find_by(token: params[:referral_token])
-      referral = create_or_touch_for_existing_token(token, app, referring_user, ip: ip, http_referrer: params[:http_referrer]) if token.present?
+      token = ReferralToken.find_by(token: token_string)
+      # TODO what if token is nil? (e.g params[:referral_token] isn't referring to an existing referral token)
+      referral = create_or_touch_for_existing_token(token, app, referring_user, params) if token.present?
     else
-      # Create a new referral (it will generate a new referral token):
-      referral = Referral.new(referring_user: referring_user, app: app, http_referrer: params[:http_referrer], ip_address: ip)
+      # Create a new referral (it will generate it own new referral token):
+      referral = Referral.new(params.merge(referring_user: referring_user, app: app))
       referral.save!
     end
 
-    # If the user is authenticated, try to link the referral's token with this user:
+    # 2. If the user is authenticated, try to link the referral's referral_token with this user:
     if referred_user.present?
       token = referral.referral_token || ReferralToken.new(token: SecureRandom.hex(48))
-      token.user = referred_user
+
+      # Don't ovveride which user has claimed this token
+      # XXX implement ReferralToken#claim, call it here and in ReferralTokensController#claim
+      #
+      # XXX return 401 code if the token already belongs to someone else
+      token.user = referred_user unless token.user.present?
       token.save
     end
 
     referral
   end
 
-  def self.record_conversion(app, user)
+  def self.record_conversion(user, app)
     ref = joins(:referral_token)
             .where(referral_tokens: {user: user}, app: app)
             .order(created_at: :desc)
 
     # We filter the list to make sure we don't mark self-referrals as converted. However, if the referral
-    # token claiming logic worked correctly, there should be no self referral in this list
+    # token claiming logic worked correctly, there should be no self-referral in this list
     # see https://trello.com/c/FuLmYri3
     # XXX add a logger to record the fact that the filtering logic in the upstream flow
     # hasn't worked as expected?
     ref = ref.select {|r| r.referred_user.id != r.referring_user.id}
 
+    # Stop here if there is already a converted referral recorded for this user on this app:
+    converted_referrals = ref.select {|r| r.converted}
+
+    return if converted_referrals.present?
+
+    # Stop here if there's no referral to convert for this user and this app:
+    # XXX Should we really do this ?
     return unless ref.first.present?
+
     converted_referral = ref.first
 
     # We only update the latest referral, because we assume that it's the one
     # that triggered the conversion.
     converted_referral.update(converted: true)
 
-    if app.is_dti_airdrop?
-      AirdropMint.reward_converted_referral(converted_referral)
-    end
+    # Mint the rewards:
+    AirdropMint.deliver_for_referral(converted_referral)
+  end
+
+  #
+  # Record conversion for all referrals related to apps whose only condition for
+  # converting is "the user signed in"
+  #
+  def self.on_signin_convert(user)
+    # ETHSF_HACK: we may want to do this:
+    # App.where(convert_on_signin: true).each {|app| Referral.record_conversion(user, app)}
+    # But we're currently working in a context where *all* apps are converting on user sign in:
+    App.all.each {|app| self.record_conversion(user, app)}
   end
 
   #
@@ -101,7 +141,7 @@ class Referral < ApplicationRecord
   #
   def self.delete_self_referrals(user)
     ref = joins(:referral_token).where(referring_user: user, referral_tokens: {user: user})
-    # XXX performance overhead of destroy_all vs delete_all (are there lifecycle hooks that need to be called?)
+    # XXX performance overhead of destroy_all vs delete_all? (are there lifecycle hooks that need to be called?)
     ref.destroy_all
   end
 
@@ -125,9 +165,13 @@ class Referral < ApplicationRecord
       return existing_referral
     end
 
+    new_params = params.merge(referring_user: referring_user, app: app)
+
     # Otherwise, create a new one:
-    new_referral = Referral.new(referring_user: referring_user, app: app, http_referrer: params[:http_referrer], ip_address: params[:ip])
+    new_referral = Referral.new(new_params)
     new_referral.referral_token = token
+
+    new_referral.save!
 
     return new_referral
   end

@@ -5,6 +5,7 @@ Doorkeeper.configure do
   # This block will be called to check whether the resource owner is authenticated or not.
   resource_owner_authenticator do
     user = User.find_by_id(session[:user_id])
+
     next user if user.present?
 
     if params[:prompt].to_s.split(/ +/).include?('none')

@@ -16,7 +16,7 @@ services:
     build:
       context: .
       args:
-        - RAILS_ENV=production
+        USE_HTTP: ${USE_HTTP}
     environment:
       RAILS_ENV: production
       DB_HOST: db
@@ -27,6 +27,8 @@ services:
       FACEBOOK_APP_ID: ${FACEBOOK_APP_ID}
       FACEBOOK_APP_SECRET: ${FACEBOOK_APP_SECRET}
       ALLOWED_ORIGINS: ${ALLOWED_ORIGINS}
+      AIRDROP_PRIVATE_KEY: ${AIRDROP_PRIVATE_KEY}
+      INFURA_API_KEY: ${INFURA_API_KEY}
     ports:
       - 8080:80
       - 4430:443
@@ -43,3 +45,10 @@ services:
       - ${DATA_DIRECTORY}/app/rails_logs:/home/app/webapp/log
       - ${DATA_DIRECTORY}/app/nginx_logs:/var/log/nginx
       - ${DATA_DIRECTORY}/app/letsencrypt:/etc/letsencrypt
+  
+  mobile-app-webview-front:
+    build:
+      context: ./mobile-app-webview-ui
+      args:
+        REACT_APP_BACKEND_URL: ${BACKEND_URL}
+        REACT_APP_OAUTH_CLIENT_ID: ${MOBILE_APP_WEBVIEW_UI_CLIENT_ID}

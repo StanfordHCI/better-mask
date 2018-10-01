@@ -4,6 +4,9 @@
 #
 #  id            :bigint(8)        not null, primary key
 #  admin         :boolean          default(FALSE), not null
+#  email         :string(255)
+#  first_name    :string(255)
+#  last_name     :string(255)
 #  name          :string(255)
 #  referral_code :string(255)      not null
 #  token         :string(255)
@@ -23,9 +26,11 @@ class User < ApplicationRecord
     user = find_or_initialize_by(uid: auth['uid'])
 
     user.name = auth['info']['name']
+    user.first_name = auth['info']['first_name']
+    user.last_name = auth['info']['last_name']
 
     user.generate_token
-    user.generate_referral_code
+    user.generate_new_referral_code unless user.referral_code.present?
 
     user.save!
     user
@@ -35,10 +40,24 @@ class User < ApplicationRecord
     self.token = SecureRandom.base64(180)
   end
 
-  def generate_referral_code
-    # Get rid of all diacritics, replacing all letters with their non-accented variants
-    transliterated = I18n.transliterate(self.name)
-    self.referral_code = transliterated.downcase.strip.gsub(' ', '').gsub(/[^\w-]/, '')
+  def generate_new_referral_code
+    length = 6
+    referral_code = SecureRandom.alphanumeric(length)
+
+    # 10 tries to generate a unique
+    i = 0
+    while i < 10
+      if User.find_by(referral_code: referral_code).present?
+        referral_code = SecureRandom.alphanumeric(length)
+        i+=1
+      else
+        # Breaks out of the whole method:
+        self.referral_code = referral_code
+        return
+      end
+    end
+
+    raise 'Could not generate unique referral code'
   end
 
   def as_json(options = {})
@@ -56,10 +75,9 @@ class User < ApplicationRecord
   end
 
   def wallet_address
-    raise "not yet implemented: user - vaults association"
-    # TODO vaults: has_one or has_many ? how to make it optional ?
-    # how to handle the case where the user has no vault
-    return nil unless vaults.present && !vaults.empty
-    vaults.first.wallet_address
+    # TODO vaults-user association: optional has_one or optional has_many?
+    vault = Vault.find_by(user: self)
+    return nil unless vault.present?
+    vault.wallet_address
   end
 end

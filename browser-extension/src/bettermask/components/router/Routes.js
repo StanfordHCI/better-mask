@@ -11,6 +11,7 @@ import Assets from 'pages/Assets';
 import Referrals from 'pages/Referrals';
 import PendingTransactions from 'pages/PendingTransactions';
 import ConfirmTransaction from 'pages/ConfirmTransaction';
+import Profile from 'pages/Profile';
 
 import {
   DEFAULT_ROUTE,
@@ -20,7 +21,8 @@ import {
   REFERRALS_ROUTE,
   AUTH_CALLBACK_ROUTE,
   PENDING_TRANSACTIONS_ROUTE,
-  CONFIRM_TRANSACTION_ROUTE
+  CONFIRM_TRANSACTION_ROUTE,
+  PROFILE_ROUTE
 } from 'routes';
 
 const TitleSetterRoute = (props) => {
@@ -46,26 +48,14 @@ const Routes = (props) => {
       
       <InitializedRoute path={UNLOCK_ROUTE} exact component={Unlock} />
       <InitializedRoute path={AUTH_CALLBACK_ROUTE} exact component={AuthCallback} />
-
-      {/* <Route exact path={DEFAULT_ROUTE} component={Home} /> */}
       
       <AuthenticatedRoute path={ASSETS_ROUTE} component={Assets} />
       <AuthenticatedRoute path={REFERRALS_ROUTE} component={Referrals} />
       <AuthenticatedRoute path={PENDING_TRANSACTIONS_ROUTE} component={PendingTransactions} />
       <AuthenticatedRoute path={CONFIRM_TRANSACTION_ROUTE} component={ConfirmTransaction} />
+      <AuthenticatedRoute path={PROFILE_ROUTE} component={Profile} />
 
-      {/* <InitializedRoute path={RESTORE_VAULT_ROUTE} exact component={RestoreVaultPage} />
-      <AuthenticatedRoute path={REVEAL_SEED_ROUTE} exact component={RevealSeedConfirmation} />
-      <AuthenticatedRoute path={SETTINGS_ROUTE} component={Settings} />
-      <AuthenticatedRoute path={NOTICE_ROUTE} exact component={NoticeScreen} />
-      <AuthenticatedRoute path={`${CONFIRM_TRANSACTION_ROUTE}/:id?`} component={ConfirmTxScreen} />
-      <AuthenticatedRoute path={SEND_ROUTE} exact component={SendTransactionScreen} />
-      <AuthenticatedRoute path={ADD_TOKEN_ROUTE} exact component={AddTokenPage} />
-      <AuthenticatedRoute path={CONFIRM_ADD_TOKEN_ROUTE} exact component={ConfirmAddTokenPage} />
-      <AuthenticatedRoute path={NEW_ACCOUNT_ROUTE} component={CreateAccountPage} /> */}
-
-      {/* <Route path="/auth_callback" component={AuthCallback} /> */}
-      <Route exact path={DEFAULT_ROUTE} render={() => <Redirect to={ASSETS_ROUTE} />} />
+      <AuthenticatedRoute exact path={DEFAULT_ROUTE} render={() => <Redirect to={ASSETS_ROUTE} />} />
     </Switch>
   );
 }

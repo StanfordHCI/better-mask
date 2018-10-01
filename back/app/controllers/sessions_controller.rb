@@ -1,6 +1,4 @@
 class SessionsController < ApplicationController
-  include ActionController::MimeResponds
-
   skip_before_action :authenticate_user, only: [:create]
 
   # Handle the oAuth callback when signing in with an external provider (we
@@ -17,8 +15,6 @@ class SessionsController < ApplicationController
         return redirect_to request.env['omniauth.origin']
       end
 
-      # TODO default value for return_to? => our front-end
-      # TODO was the return_to parameter even needed in the first place?
       respond_to do |format|
         format.json do
           render json: {message: 'Successfully authenticated', user: user}, status: 200

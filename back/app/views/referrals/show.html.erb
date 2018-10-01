@@ -1,8 +1,20 @@
+<p>You are about to be <a href="<%= redirect_url %>" id="redirect-link">redirected</a>.</p>
+
+<% if Rails.env.development? %>
+  <p>
+    This is a development environment. You will not be automatically redirected. Click the link above. <br>
+    This will not appear in production.
+  </p>
+<% end %>
+
 <script type="text/javascript" charset="utf-8">
+  var dev = <%= Rails.env.development? %>;
+
   var pending_referral_data = {
     referral_code: "<%= referrer.referral_code %>",
     application_slug: "<%= app.slug %>",
     http_referrer: document.referrer,
+    source: "<%= source_param %>",
   };
 
   var existingToken = getReferralToken();
@@ -11,10 +23,10 @@
   createPendingReferral(pending_referral_data)
     .then(function (response) {
       saveReferralToken(response.data.token);
-      window.location = "<%= redirect_url %>";
+      if (!dev) window.location = "<%= redirect_url %>";
     })
     .catch(function (error) {
       console.warn('Failed creating pending referral: ', error);
-      window.location = "<%= redirect_url %>";
+      if (!dev) window.location = "<%= redirect_url %>";
     });
 </script>

@@ -37,7 +37,7 @@ export default function Stats(props) {
       <Flex>
         <Box flex={1}>
           <Category>Successfully joined</Category>
-          <CategoryDetails>Number of people you referred who joined Tori.Land</CategoryDetails>
+          <CategoryDetails>Number of people you referred who joined</CategoryDetails>
         </Box>
         <Box><div style={{paddingTop: 12, paddingLeft: 16, fontSize: '1.3em' }}>{stats.invited_users.length}</div></Box>
       </Flex>

@@ -10,15 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_09_04_160726) do
+ActiveRecord::Schema.define(version: 2018_09_27_191742) do
 
   create_table "airdrop_mints", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "user_id"
     t.bigint "app_id"
-    t.boolean "minted"
+    t.boolean "minted", default: false, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "referral_id"
     t.index ["app_id"], name: "index_airdrop_mints_on_app_id"
+    t.index ["referral_id"], name: "index_airdrop_mints_on_referral_id"
     t.index ["user_id"], name: "index_airdrop_mints_on_user_id"
   end
 
@@ -32,6 +34,12 @@ ActiveRecord::Schema.define(version: 2018_09_04_160726) do
     t.bigint "oauth_application_id"
     t.integer "minting_quota", default: 0, null: false
     t.string "referral_landing_path"
+    t.string "contract_type"
+    t.string "contract_address"
+    t.boolean "onchain_airdrop_enabled", default: false, null: false
+    t.string "network"
+    t.bigint "developer_id", null: false
+    t.index ["developer_id"], name: "index_apps_on_developer_id"
     t.index ["oauth_application_id"], name: "index_apps_on_oauth_application_id"
   end
 
@@ -88,6 +96,13 @@ ActiveRecord::Schema.define(version: 2018_09_04_160726) do
     t.index ["uid"], name: "index_oauth_applications_on_uid", unique: true
   end
 
+  create_table "oauth_authorization_attempts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_oauth_authorization_attempts_on_user_id"
+  end
+
   create_table "referral_tokens", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "token", null: false
     t.datetime "created_at", null: false
@@ -105,6 +120,8 @@ ActiveRecord::Schema.define(version: 2018_09_04_160726) do
     t.string "ip_address"
     t.bigint "referral_token_id"
     t.boolean "converted", default: false, null: false
+    t.string "source"
+    t.string "user_agent"
     t.index ["app_id"], name: "index_referrals_on_app_id"
     t.index ["referral_token_id"], name: "index_referrals_on_referral_token_id"
     t.index ["referring_user_id"], name: "index_referrals_on_referring_user_id"
@@ -118,6 +135,9 @@ ActiveRecord::Schema.define(version: 2018_09_04_160726) do
     t.string "token"
     t.string "referral_code", null: false
     t.boolean "admin", default: false, null: false
+    t.string "first_name"
+    t.string "last_name"
+    t.string "email"
     t.index ["referral_code"], name: "index_users_on_referral_code", unique: true
   end
 
@@ -132,13 +152,16 @@ ActiveRecord::Schema.define(version: 2018_09_04_160726) do
   end
 
   add_foreign_key "airdrop_mints", "apps"
+  add_foreign_key "airdrop_mints", "referrals"
   add_foreign_key "airdrop_mints", "users"
   add_foreign_key "apps", "oauth_applications"
+  add_foreign_key "apps", "users", column: "developer_id"
   add_foreign_key "coin_rewards", "apps"
   add_foreign_key "coin_rewards", "referrals"
   add_foreign_key "coin_rewards", "users"
   add_foreign_key "oauth_access_grants", "oauth_applications", column: "application_id"
   add_foreign_key "oauth_access_tokens", "oauth_applications", column: "application_id"
+  add_foreign_key "oauth_authorization_attempts", "users"
   add_foreign_key "referral_tokens", "users"
   add_foreign_key "referrals", "apps"
   add_foreign_key "referrals", "referral_tokens"

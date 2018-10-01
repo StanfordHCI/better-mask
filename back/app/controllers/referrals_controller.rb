@@ -5,6 +5,7 @@ class ReferralsController < ApplicationController
   # user's browser
   #
   def show
+    session[:referral_link] = request.original_url
     app = App.find_by(slug: params[:app_slug])
     referrer = User.find_by(referral_code: params[:referral_code])
 
@@ -12,7 +13,7 @@ class ReferralsController < ApplicationController
 
     # TODO what to do if referrer.nil? It essentially depends whether the app only allows "invited users" or allows public signup
 
-    locals = {app: app, referrer: referrer, redirect_url: redirect_url}
+    locals = {app: app, referrer: referrer, redirect_url: redirect_url, source_param: params[:source]}
     render template: 'referrals/show', locals: locals
   end
 
@@ -32,7 +33,19 @@ class ReferralsController < ApplicationController
   # Create a pending referral
   #
   def create
-    referral = Referral.create_or_touch_pending referral_params, ip: request.remote_ip, referred_user: current_user
+    tracking_params = {
+      ip_address: request.remote_ip,
+      user_agent: request.user_agent,
+    }
+
+    create_params = referral_params.merge(tracking_params)
+    referral = Referral.create_or_touch_pending(
+      current_user,
+      params[:referral_code],
+      params[:application_slug],
+      create_params
+    )
+
     return render json: referral, status: :ok, include: [:app], methods: [:referring_user_name, :token, :app]
   rescue ActiveRecord::RecordNotFound => e
     return render json: { error: e.to_s }, status: :not_found
@@ -41,6 +54,6 @@ class ReferralsController < ApplicationController
   private
 
   def referral_params
-    params.permit(:referral_code, :application_slug, :http_referrer, :referral_token)
+    params.permit(:http_referrer, :referral_token, :source)
   end
 end

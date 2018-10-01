@@ -25,12 +25,13 @@
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  user: one
-  amount: 1
-  app: one
-
-two:
-  user: two
-  amount: 1
-  app: two
+#one:
+#  user: one
+#  amount: 1
+#  app: one
+#  referral:
+#
+#two:
+#  user: two
+#  amount: 1
+#  app: two

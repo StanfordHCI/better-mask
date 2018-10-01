@@ -19,7 +19,7 @@ default: &default
 development:
   <<: *default
   socket: /var/run/mysqld/mysqld.sock
-  database: blockchain-explorer-back_development
+  database: bettermask-back_development
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
@@ -27,7 +27,7 @@ development:
 test:
   <<: *default
   socket: /var/run/mysqld/mysqld.sock
-  database: blockchain-explorer-back_test
+  database: bettermask-back_test
 
 # As with config/secrets.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is

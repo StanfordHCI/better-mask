@@ -7,10 +7,10 @@ import logger from 'loglevel';
 import { UNLOCK_ROUTE, INITIALIZE_ROUTE } from '../../routes';
 
 const AuthenticatedRoute = props => {
-  const { isUnlocked, isInitialized } = props;
+  const { isUnlocked, isInitialized, isAuthenticated } = props;
   
   switch (true) {
-    case isUnlocked && isInitialized:
+    case isUnlocked && isInitialized && isAuthenticated:
       return <Route {...props} />;
     case !isInitialized:
       return <Redirect to={{pathname: INITIALIZE_ROUTE }} />
@@ -22,13 +22,14 @@ const AuthenticatedRoute = props => {
 AuthenticatedRoute.propTypes = {
   isUnlocked: PropTypes.bool,
   isInitialized: PropTypes.bool,
+  isAuthenticated: PropTypes.bool,
 }
 
 const mapStateToProps = state => {
-  const { metamask: { isUnlocked, isInitialized } } = state
   return {
-    isUnlocked,
-    isInitialized,
+    isUnlocked: state.metamask.isUnlocked,
+    isInitialized: state.metamask.isInitialized,
+    isAuthenticated: state.auth.authenticated,
   }
 }
 

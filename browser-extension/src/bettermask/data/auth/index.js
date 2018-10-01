@@ -20,22 +20,23 @@ const initialState = {
   // true: we know we are authenticated
   authenticated: null,
   lockingAccount: false,
+  loadingAuthStatus: false,
 }
 
 export default function authReducer(state = initialState, action) {
-  // Reducers get passed the fullState because using combineReducers
-  // would have made things too easy:
-  // const state = {
-  //   ...initialState,
-  //   ...fullState.auth,
-  // };
-
   switch(action.type) {
+    case LOAD_AUTH_STATUS:
+      return {
+        ...state,
+        loadingAuthStatus: true,
+      }
+      
     case RECEIVE_ACCESS_TOKEN:
       return {
         ...state,
         accessToken: action.accessToken,
         authenticated: true,
+        loadingAuthStatus: false,
       }
 
     case NOT_AUTHENTICATED:
@@ -43,6 +44,7 @@ export default function authReducer(state = initialState, action) {
         ...state,
         accessToken: null,
         authenticated: false,
+        loadingAuthStatus: false,
       }
 
     case LOCK_ACCOUNT:
@@ -68,7 +70,7 @@ export const receiveAccessToken = (token) => {
   }
 }
 
-export const notAuthenticated = () => {
+export const clearAuthenticated = () => {
   return {
     type: NOT_AUTHENTICATED,
   }
@@ -86,7 +88,7 @@ export const loadAuthStatus = () => {
       return dispatch(receiveAccessToken(token));
     }
 
-    return dispatch(notAuthenticated());
+    return dispatch(clearAuthenticated());
   }
 }
 

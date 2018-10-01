@@ -1,0 +1,17 @@
+<script type="text/javascript" charset="utf-8">
+  function reportToExtension(web3Detected) {
+    var params = {
+      web3Detected: web3Detected,
+    };
+
+    var data = { type: "bettermask__web3-detection-result", params: params };
+    window.postMessage(data, '<%= root_url %>');
+  }
+
+  window.addEventListener('load', function() {
+    console.log('window load event fired');
+    // Checking if Web3 has been injected by the browser (Mist/MetaMask)
+    var web3Detected = typeof web3 !== 'undefined';
+    reportToExtension(web3Detected);
+  });
+</script>

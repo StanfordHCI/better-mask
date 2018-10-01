@@ -7,17 +7,8 @@ class ActiveSupport::TestCase
   # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
   fixtures :all
 
-
-  def authenticated_post path, args
-    args = authenticated_request_args args
-
-    post path, args
-  end
-
-  def authenticated_get path, args
-    args = authenticated_request_args args
-
-    get path, args
+  def authenticate_user user
+    ApplicationController.any_instance.stubs(:current_user).returns(user)
   end
 
   # TODO _patch, _put, _delete etc...
@@ -28,21 +19,11 @@ class ActiveSupport::TestCase
     Api::BaseController.any_instance.stubs(:doorkeeper_token).returns(token)
   end
 
-  def parsed_response_body
-    JSON.parse(response.body)
+  def oauth_application app
+    Api::BaseController.any_instance.stubs(:current_application).returns(app)
   end
 
-  private
-
-  def authenticated_request_args args
-    user = args[:user] || User.first
-    args.delete :user
-
-    raise 'authenticated_post test helper: user must have a token' unless user.token.present?
-
-    args[:headers] ||= {}
-    headers = args[:headers].merge ({Authorization: "Bearer #{user.token}"})
-
-    args.merge ({headers: headers})
+  def parsed_response_body
+    JSON.parse(response.body)
   end
 end

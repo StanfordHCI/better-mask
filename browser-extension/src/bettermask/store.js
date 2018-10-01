@@ -1,33 +1,35 @@
 // @flow
 
-import { createStore as redux_createStore, combineReducers, applyMiddleware, compose } from 'redux';
+import { createStore as redux_createStore, combineReducers, applyMiddleware } from 'redux';
+
+import logger from 'redux-logger'
 import thunk from 'redux-thunk';
 
 
 // Reducers:
-import referrals from 'data/referrals';
+import offers from 'data/offers';
 import applications from 'data/applications';
 import interfaceReducer from 'data/interface';
 import metamask from 'data/metamask';
 import auth from 'data/auth';
 import send from 'data/send';
+import user from 'data/user';
+
 
 const reducers = combineReducers({
   auth,
-  referrals,
+  offers,
   applications,
   interface: interfaceReducer,
   metamask,
   send,
+  user,
 });
-
-const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
-const enhancers = composeEnhancers(applyMiddleware(thunk));
 
 let store;
 
 export function createStore(initialState) {
-  store = redux_createStore(reducers, initialState, enhancers);
+  store = redux_createStore(reducers, initialState, applyMiddleware(thunk, logger));
   return store;
 }
 

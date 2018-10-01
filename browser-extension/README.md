@@ -1,6 +1,6 @@
-# Blockchain explorer browser extension
+# Bettermask browser extension
 
-## Developing on Blockchain Explorer
+## Developing on Bettermask
 
 1. Setup backend first
 

@@ -27,6 +27,11 @@ const inpageSrc = extension.extension.getURL('inpage.bundle.js')
 // If we create a FireFox-only code path using that API,
 // MetaMask will be much faster loading and performant on Firefox.
 
+// Listen for pages self-posting messages to themselves (we are using this mechanism as a way
+// to send messages from an app to the extension that can be lost if the extension isn't present -
+// e.g giving the access token to the ext).
+listenForMessages();
+
 if (shouldInjectWeb3()) {
   setupInjection();
   setupStreams();
@@ -107,11 +112,6 @@ function setupStreams () {
   // ignore unused channels (handled by background, inpage)
   mux.ignoreStream('provider')
   mux.ignoreStream('publicConfig')
-
-  // Listen for pages self-posting messages to themselves (we are using this mechanism as a way
-  // to send messages from an app to the extension that can be lost if the extension isn't present -
-  // e.g giving the access token to the ext).
-  listenForMessages(pluginStream);
 }
 
 
@@ -133,6 +133,7 @@ function logStreamDisconnectWarning (remoteLabel, err) {
  * @returns {boolean} {@code true} if Web3 should be injected
  */
 function shouldInjectWeb3 () {
+  return false;
   return doctypeCheck() && suffixCheck()
     && documentElementCheck() && !blacklistedDomainCheck()
 }
@@ -234,7 +235,7 @@ function listenForMessages() {
     if (window.location.origin !== BACKEND_URL) return;
 
     if (event.data.type && (event.data.type === OAUTH_CALLBACK_MESSAGE_TYPE)) {
-      console.log("Content script received message: ", event.data);
+      if (process.env.METAMASK_DEBUG) console.log("Content script received message: ", event.data);
       extension.runtime.sendMessage(event.data);
     }
   });

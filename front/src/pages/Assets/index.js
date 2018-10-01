@@ -103,7 +103,7 @@ export default class Assets extends React.Component {
           <AssetRow>
             <AssetCol>
               <LogoWrapper>
-                <img src="https://ae01.alicdn.com/kf/HTB1NfHJPpXXXXXiXFXXq6xXFXXXi/12-3cm-12-1cm-PI-Symbol-Fashion-Motorcycle-Vinyl-Car-Styling-Car-Sticker-Black-Silver-S3.jpg" alt="Ether" />
+                <img src="https://xxx/yyy.jpg" alt="BECoin" />
               </LogoWrapper>
             </AssetCol>
 

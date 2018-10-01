@@ -50,10 +50,10 @@ class UnlockPage extends Component {
     this.animationEventEmitter = new EventEmitter()
   }
 
-  componentWillMount () {
-    const { isUnlocked, history } = this.props
+  componentWillReceiveProps(props) {
+    const { isUnlocked, history, isAuthenticated } = props;
 
-    if (isUnlocked) {
+    if (isUnlocked && isAuthenticated) {
       history.push(DEFAULT_ROUTE)
     }
   }
@@ -92,6 +92,8 @@ class UnlockPage extends Component {
 
     // const {t} = this.context;
     const t = (key) => key;
+
+    if (this.props.loading) return null;
 
     return (
       <Container>

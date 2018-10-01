@@ -110,7 +110,7 @@ class Layout extends React.Component {
     const { accountMenuAnchor } = this.state;
     const accountMenuOpen = Boolean(accountMenuAnchor);
 
-    const hideBackButton = location.pathname !== REFERRALS_ROUTE;
+    const hideBackButton = location.pathname === DEFAULT_ROUTE || location.pathname === ASSETS_ROUTE;
 
     const drawer = (
       <div>

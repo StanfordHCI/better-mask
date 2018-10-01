@@ -1,9 +1,28 @@
+<div style="text-align: center; margin-top: 64px">
+  <p>Hang tight! You are about to be <a href="#" id="redirect-link">redirected</a>.</p>
+  <% if Rails.env.development? %>
+    <p>
+      This is a development environment. You will not be automatically redirected. Click the link above. <br>
+      This will not appear in production.
+    </p>
+  <% end %>
+</div>
+
 <script type="text/javascript" charset="utf-8">
   function redirect() {
+    var dev = <%= Rails.env.development? %>;
+
     if (window.location.search) {
       var p = window.location.search.substring(1).split('=');
       if (p[0] === 'redirect_uri' && p[1] != null) {
-        window.location = decodeURIComponent(p[1]);
+        var url = decodeURIComponent(p[1]);
+
+        document.getElementById('redirect-link').href = url;
+
+        if (!dev) {
+          window.location = url;
+        }
+
         return;
       }
     }

@@ -6,6 +6,8 @@ import UnlockPage from './unlock-page.component'
 const mapStateToProps = state => {
   const { metamask: { isUnlocked, isPopup } } = state
   return {
+    loading: state.auth.loadingAuthStatus,
+    isAuthenticated: state.auth.authenticated,
     isUnlocked,
     isPopup,
   }

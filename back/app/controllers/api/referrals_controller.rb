@@ -2,7 +2,9 @@ class Api::ReferralsController < Api::BaseController
   # Returns a list of the referrals made by the current user for the current app:
   def index
     user = current_resource_owner
-    app = current_social_app
+
+    # DTI_HACK
+    app = App.dti_app
 
     # TODO filter by current app
     # @see UsersController#referral_link
@@ -31,10 +33,13 @@ class Api::ReferralsController < Api::BaseController
 
     render(
       json: {
-        referrals: converted_refs,
-        invited_users: invited_users,
-        pending_referrals_count: pending_referrals_count,
-        all_referrals_count: all_referrals_count,
+        bct: {
+          invited_users: invited_users,
+          pending_referrals_count: pending_referrals_count,
+          total: all_referrals_count,
+          earnings: invited_users.length,
+          ticker: 'BCT'
+        }
       },
       status: :ok,
       methods: [:referred_user]
@@ -44,7 +49,7 @@ class Api::ReferralsController < Api::BaseController
   def convert
     app = current_social_app
     user = current_resource_owner
-    Referral.record_conversion(app, user)
+    Referral.record_conversion(user, app)
 
     head :no_content
   end

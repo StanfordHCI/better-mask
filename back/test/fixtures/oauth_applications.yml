@@ -1,0 +1,11 @@
+# Creating fixture for an unmapped table requires to provide all fields, including id and created_at...
+cribtori:
+  id: 12345
+  name: Cribtori
+  uid: abcd1234
+  secret: 1234abcd
+  redirect_uri: http://whatever.yolo.ok
+  scopes: ''
+  confidential: false
+  created_at: <%= 5.day.ago.to_s(:db) %>
+  updated_at: <%= 5.day.ago.to_s(:db) %>

@@ -1,10 +1,13 @@
 #
-# Extensions prepended to the authorizations controller:
+# Extension prepended to the authorizations controller:
 #
-
 module AuthorizationsControllerExtension
-  def redirect_or_render auth
+  def redirect_or_render(auth)
     orig_redirect_uri = auth.redirect_uri
+
+    if orig_redirect_uri.is_a? Hash
+      orig_redirect_uri = url_for orig_redirect_uri
+    end
 
     # Encode the return_to param to be URL compatible:
     escaped_redirect_uri = URI.escape(orig_redirect_uri, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))

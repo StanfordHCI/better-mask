@@ -56,11 +56,11 @@ export const createNewVaultAndKeychain = (password) => {
 
 
 export const createNewVaultAndRestore = (password, seed) => {
-  return (dispatch) => {
+  return async (dispatch) => {
     dispatch(showLoadingIndication())
     log.debug(`background.createNewVaultAndRestore`)
 
-    return new Promise((resolve, reject) => {
+    await new Promise((resolve, reject) => {
       const background = getBackground();
       background.createNewVaultAndRestore(password, seed, err => {
         if (err) {
@@ -70,7 +70,9 @@ export const createNewVaultAndRestore = (password, seed) => {
         resolve()
       })
     })
-    .then(() => dispatch(unMarkPasswordForgotten()))
+    .then(async () => {
+      await dispatch(unMarkPasswordForgotten());
+    })
     .then(() => {
       dispatch(showAccountsPage())
       dispatch(hideLoadingIndication())
@@ -154,17 +156,36 @@ export const lockMetamask = () => {
 }
 
 function unMarkPasswordForgotten () {
-  return dispatch => {
+  return async (dispatch) => {
     log.debug('background.unMarkPasswordForgotten');
-    return new Promise(resolve => {
+    
+    await new Promise(resolve => {
       const background = getBackground();
       background.unMarkPasswordForgotten(() => {
         dispatch(forgotPassword(false))
-        resolve()
+        resolve();
       })
     })
-      .then(() => forceUpdateMetamaskState(dispatch))
+    
+    await forceUpdateMetamaskState(dispatch);
   }
+}
+
+function forceUpdateMetamaskState(dispatch) {
+  log.debug(`background.getState`)
+  return new Promise((resolve, reject) => {
+    const background = getBackground();
+    background.getState((err, newState) => {
+      if (err) {
+        console.warn(err);
+        dispatch(actions.displayWarning(err.message))
+        return reject(err)
+      }
+
+      dispatch(updateMetamaskState(newState));
+      resolve(newState);
+    })
+  })
 }
 
 export const tryUnlockMetamask = (password) => {

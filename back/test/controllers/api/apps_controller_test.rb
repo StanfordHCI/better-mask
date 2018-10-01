@@ -1,9 +1,10 @@
 require 'test_helper'
 
-class AppsControllerTest < ActionDispatch::IntegrationTest
+class Api::AppsControllerTest < ActionDispatch::IntegrationTest
   test "Index" do
     user = User.first
-    authenticated_get "/apps", user: user
+    oauth_user user
+    get "/api/apps"
     assert_response :ok
 
     res = JSON.parse response.body

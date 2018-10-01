@@ -6,6 +6,8 @@
 #  converted         :boolean          default(FALSE), not null
 #  http_referrer     :string(255)
 #  ip_address        :string(255)
+#  source            :string(255)
+#  user_agent        :string(255)
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #  app_id            :bigint(8)

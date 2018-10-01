@@ -1,0 +1,51 @@
+<style>
+  div {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+
+  #wrapper {
+    width: 100vw;
+    height: 100vh;
+    padding: 64px;
+    padding-top: 4px;
+    padding-right: 32px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end
+  }
+
+  #logo {
+    width: 100px;
+  }
+
+  .welcome {
+    font-size: 1.5em;
+  }
+</style>
+
+<div id="wrapper">
+  <div style="margin-right: 32px; text-align: center; padding-top: 100px">
+    <% if params[:signedin].present? && @current_user.present? %>
+      <p class="welcome">Welcome, <%= @current_user.first_name || @current_user.name %>!</p>
+    <% end %>
+    <h1>
+      Click this icon
+      <%= image_tag 'click_logo_inline.png', style: 'display: inline; vertical-align: middle' %>
+
+      <% if params[:signedin].present? %>
+        once again
+        <br>
+        to view your assets
+      <% else %>
+        <br>
+        to open your vault
+      <% end %>
+    </h1>
+  </div>
+
+  <div>
+    <%= image_tag 'arrow.png' %>
+  </div>
+</div>

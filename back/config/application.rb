@@ -26,12 +26,14 @@ module BettermaskBack
       allow do
         allowed_origins = JSON.parse ENV["ALLOWED_ORIGINS"]
 
-        begin
-          apps = ::App.all
-          app_origins = apps.map(&:url)
-        rescue ActiveRecord::StatementInvalid # Happens when db is not initialized yet
-          app_origins = []
-        end
+        app_origins = []
+
+        # begin
+        #   apps = ::App.all
+        #   app_origins = apps.map(&:url)
+        # rescue ActiveRecord::StatementInvalid # Happens when db is not initialized yet
+        #   app_origins = []
+        # end
 
         allowed_origins.concat(app_origins)
 
